@@ -1,0 +1,424 @@
+function [stroopData]=ComputerizedStroop(debug,subjN,init, runNum, window, respBut)
+%% Computerized Stroop Task
+%This is so that we can have a computerized stroop to run.  There are a few
+%different designs that could be implemented, but this is the 10minute,
+%simple version.  This version will only use the colors Red, Blue, and
+%Green on a white background.
+
+% There will be 54 trials of congruent, 54 of incongruent, and 54 of
+% neutral (XXXX) trials randomly mixed together.  Breaks will occur every
+% 54 trials, so there will be 3 blocks of 54 (18 of each stim type).  Each block
+% will contain 6 BB/GG/RR combos and 3 each of the incongruent combos and 6
+% XXXX of each of the three colors.
+
+%Stimuli are presented one at a time in the center of the screen.  The word
+%will be on the screen for a maximum of 1.5s, after which a fixation cross
+%will come up for .5s before the next trial (.5s ITI).
+%Trials that get a response before 1.5s will end at the
+%response time, and proceed to the fixation cross for .5.
+% clear
+
+
+%% setup
+%First, switch directories to the program files director
+exptDir = pwd;
+instDir = [exptDir '/Instructions'];
+% dataDir=[pwd '/Data/'];
+
+fileName=['Stroop' mat2str(subjN) '_' init '_' mat2str(runNum) '.mat'];
+
+%% For testing
+% Open window if window doesn't exist
+% if ~exist('window','var')
+%     [window, screenRect] = Screen(0,'OpenWindow');
+%     HideCursor;
+% else
+%     [window, screenRect]=Screen(0,'OpenWindow'); 
+% end
+
+screenRect=get(0,'Screensize');
+Screen(window,'TextFont','Arial Black');
+
+%% For testing
+if debug==1
+    speedup=1/100;
+else
+    speedup=1;
+end
+HideCursor
+
+%% More screen specifications
+% Specify color values
+white = [255 255 255];
+gray = [128 128 128];
+black = [0 0 0];
+green = [0 255/1.5 0];
+red = [255/1.5, 0, 0];
+greenFeed=[0 255 0];
+redFeed=[255 0 0];
+blue = [0, 0, 255/2];
+
+rect = get( 0, 'Screensize' ); 
+Xorigin = rect(3)/2; %X Center of screen
+Yorigin = rect(4)/2; %Y Center of screen
+% xSize = rect(3); %length of the x-dim of the screen
+% ySize = rect(4); %length of the y-dim of the screen
+Screen(window,'TextSize',28); %The text size for instructions and stroop testing will be different
+
+%% set response buttons random per participant
+if respBut==1
+    redCR=1;
+    blueCR=2;
+    greenCR=3;
+    instrInst1='If you think the correct response is ''red'', respond by pressing ''7''.';
+    instrInst2='If you think the correct response is ''blue'', respond by pressing ''8''.';
+    instrInst3='If you think the correct response is ''green'', respond by pressing ''9''.';
+elseif respBut==2
+    redCR=2;
+    blueCR=3;
+    greenCR=1;
+    instrInst2='If you think the correct response is ''red'', respond by pressing ''8''.';
+    instrInst3='If you think the correct response is ''blue'', respond by pressing ''9''.';
+    instrInst1='If you think the correct response is ''green'', respond by pressing ''7''.';
+else
+    redCR=3;
+    blueCR=1;
+    greenCR=2;
+    instrInst3='If you think the correct response is ''red'', respond by pressing ''9''.';
+    instrInst1='If you think the correct response is ''blue'', respond by pressing ''7''.';
+    instrInst2='If you think the correct response is ''green'', respond by pressing ''8''.';
+end
+
+%% Set up stimuli
+% The stimN number will need to change to accomodate different trial
+% numbers.  This isn't the best way to do this code, but I was lazy.
+%Correct responses are 1=Red; 2=Blue; 3=Green
+stimWord=cell(54,3);
+for stimN=1:54
+    if stimN<=12
+        stimList{stimN,1}='RED';
+    elseif stimN<=24
+        stimList{stimN,1}='GREEN';
+    elseif stimN<=36
+        stimList{stimN,1}='BLUE';
+    else
+        stimList{stimN,1}='XXXX';
+    end
+end
+for stimN=1:54
+    if stimN<=6
+        stimList{stimN,2}=red;
+        stimList{stimN,3}=redCR;
+    elseif stimN<=9
+        stimList{stimN,2}=blue;
+        stimList{stimN,3}=blueCR;
+    elseif stimN<=12
+        stimList{stimN,2}=green;
+        stimList{stimN,3}=greenCR;
+    elseif stimN<=18
+        stimList{stimN,2}=green;
+        stimList{stimN,3}=greenCR;
+    elseif stimN<=21
+        stimList{stimN,2}=blue;
+        stimList{stimN,3}=blueCR;
+    elseif stimN<=24
+        stimList{stimN,2}=red;
+        stimList{stimN,3}=redCR;
+    elseif stimN<=30
+        stimList{stimN,2}=blue;
+        stimList{stimN,3}=blueCR;
+    elseif stimN<=33
+        stimList{stimN,2}=green;
+        stimList{stimN,3}=greenCR;
+    elseif stimN<=36
+        stimList{stimN,2}=red;
+        stimList{stimN,3}=redCR;
+    elseif stimN<=42
+        stimList{stimN,2}=red;
+        stimList{stimN,3}=redCR;
+    elseif stimN<=48
+        stimList{stimN,2}=green;
+        stimList{stimN,3}=greenCR;
+    else
+        stimList{stimN,2}=blue;
+        stimList{stimN,3}=blueCR;
+    end
+end
+
+%Practice Stim List
+pracListWord=cell(18,1);
+for stimN=1:18
+    if stimN<=4
+        pracListWord{stimN,1}='BLUE';
+    elseif stimN<=8
+        pracListWord{stimN,1}='RED';
+    elseif stimN<=12
+        pracListWord{stimN,1}='GREEN';
+    else
+        pracListWord{stimN,1}='XXXX';
+    end
+end
+pracListCol={blue;blue;red;green;red;red;blue;green;green;green;blue;red;blue;blue;...
+    green;green;red;red};
+pracListAns={blueCR;blueCR;redCR;greenCR;redCR;redCR;blueCR;greenCR;greenCR;greenCR;blueCR;redCR;blueCR;blueCR;greenCR;greenCR;redCR;redCR};
+
+pracList=[pracListWord,pracListCol,pracListAns];
+        
+
+trialTiming=1.5;
+
+
+%% Start the experiment
+%Instructions
+if runNum==1
+    instructions = {'Thanks for participating in this experiment!',...
+        'You are going to be asked to perform the STROOP Task.',...
+        '',...
+        'In this tasks, you will see a word, like ''RED'', or a series of ''XXXX''',...
+        'appear in the middle of the screen.',...
+        '',...
+        'Your task is to report the COLOR of the font,',...
+        'and to ignore the meaning of the word.',...
+        '',...
+        'Please respond using the 7, 8, and 9 buttons on the number pad',...
+        'with your dominant hand, just like in the last task.',...
+        '',...
+        'Press the SPACEBAR to continue.'};
+    cenTex(instructions,window,screenRect,black,white,24) % Print text centered
+    if debug~=1;getResp('space');end; % Wait for user to press 'space bar'; 
+else
+    instructions = {'Welcome back to the STROOP Task',...
+        '',...
+        'As a reminder:',...
+        'In this tasks, you will see a word, like ''RED'', or a series of ''XXXX''',...
+        'appear in the middle of the screen.',...
+        '',...
+        'Your task is to report the COLOR of the font,',...
+        'and to ignore the meaning of the word.',...
+        '',...
+        'Please respond using the 7, 8, and 9 buttons on the number pad',...
+        'with your dominant hand, just like in the last task.',...
+        '',...
+        'Press the SPACEBAR to continue.'};
+    cenTex(instructions,window,screenRect,black,white,24) % Print text centered
+    if debug~=1;getResp('space');end; % Wait for user to press 'space bar'; 
+end
+
+% Show intro slides here
+slides=cell(4,1);
+slides{1,1}=[instDir '/Slide1.jpg'];
+slides{2,1}=[instDir '/Slide2.jpg'];
+slides{3,1}=[instDir '/Slide3.jpg'];
+slides{4,1}=[instDir '/Slide4.jpg'];
+for introSlideI=1:4
+    imgStr=slides{introSlideI};
+    img=imread(imgStr,'jpg');
+%     [slideW,slideH,nullSlide]=size(img);
+%     slideW=slideW/2;
+%     slideH=slideH/2;
+    
+    %Place the image on the screen
+%     loc = [rect(1), rect(2), rect(3), rect(4)];
+    Screen(window,'FillRect',white);
+    Screen(window,'PutImage',img)
+    if debug~=1;getResp('space');end; % Wait for user to press 'space bar'; 
+end
+%
+instructions = {'Please try to answer as quickly as possible',...
+    'without sacrificing accuracy.',...
+    '',...
+    'You will have 1.5s on each trial to respond.',...
+    'If you do not respond in time, that trial will be marked as incorrect and',...
+    'the next trial will begin.',...
+    '' instrInst1 instrInst2 instrInst3,...
+    '',...
+    'Please remember, your task is always to report the COLOR of the font,',... 
+    'and to ignore the meaning of the word.',...
+    '',...
+    'Press the SPACEBAR to continue to the practice trials.'};
+cenTex(instructions,window,screenRect,black,white,24) % Print text centered
+if debug~=1;getResp('space');end; % Wait for user to press 'space bar'; 
+
+instructions = {'During practice we will show you the correct response buttons.',...
+    'However, during the task, you will not have them.',...
+    '',...
+    'So please try your best to remember: ',...
+    'If you think the correct response is ''red'', respond by pressing ''7''.',...
+    'If you think the correct response is ''blue'', respond by pressing ''8''.',...
+    'If you think the correct response is ''green'', respond by pressing ''9''.',...
+    '',...
+    'Press the SPACEBAR to begin the practice trials.'};
+cenTex(instructions,window,screenRect,black,white,24) % Print text centered
+if debug~=1;getResp('space');end; % Wait for user to press 'space bar';
+
+%% set font for Task
+Screen(window,'TextSize',100);
+
+%% set data array
+stroopData=cell(180,5); %180 trials and 5 columns per trial
+
+%% Practice Trials (x18)
+%Quick indication that the experiment is about to begin
+cenTex({'Beginning Practice.'},window,screenRect,black,white,24) % Print text centered
+pause(.5);
+cenTex({'Beginning Practice..'},window,screenRect,black,white,24) % Print text centered
+pause(.5);
+cenTex({'Beginning Practice...'},window,screenRect,black,white,24) % Print text centered
+pause(1);
+
+Screen(window,'FillRect',white);
+
+%Shuffle stimuli by row for this block
+pracPerm=randperm(length(pracList));
+pracList=pracList(pracPerm,:);
+
+for pracI=1:18
+    stimWord=pracList(pracI,1);
+    stimCol=pracList{pracI,2};
+    CR=pracList{pracI,3};
+    
+    %Display words but have the response keys along the top
+    cenTex_stroop(stimWord,window,screenRect,stimCol,white,100)
+    
+    %Collect Response
+    %Now we want to actually collect and record results.  There will be
+    %1.5s for each response
+    if debug~=1
+        [resp, rt]=GetRespTimed('7','8','9',trialTiming);
+    else
+        resp=randi(2)-1; rt=rand(1)*2; 
+    end
+    
+    Screen(window,'FillRect',white);
+    resp=resp+1;
+    if resp==CR
+        acc=1;
+        cenTex_stroop({'CORRECT!'},window,screenRect,greenFeed,white,100)
+    else
+        acc=0;
+        cenTex_stroop({'INCORRECT.'},window,screenRect,redFeed,white,100)
+    end
+    pause(1*speedup)
+    
+    Screen(window,'FillRect',white);
+    cenTex_Stroop({'+'},window,screenRect,black,white,24)
+    pause(1*speedup);
+    
+    if stimCol(1)==170
+        stimColStr='Red';
+    elseif stimCol(2)==170
+        stimColStr='Green';
+    else
+        stimColStr='Blue';
+    end
+    
+    stroopData{pracI,1}=stimWord;
+    stroopData{pracI,2}=stimColStr;
+    stroopData{pracI,3}=CR;
+    stroopData{pracI,4}=resp;
+    stroopData{pracI,5}=rt;
+    stroopData{pracI,6}=acc;
+end
+
+%% Now for the real task
+
+%Task instructions
+instructions = {'Great job!',...
+    'You are now done with practice and are about to begin the real trials.',...
+    'During this part of the task, you will not be given the response buttons',...
+    'on the top of the screen.',...
+    '',...
+    'Please try your best to remember: ',...
+    'If you think the correct response is ''red'', respond by pressing ''7''.',...
+    'If you think the correct response is ''blue'', respond by pressing ''8''.',...
+    'If you think the correct response is ''green'', respond by pressing ''9''.',...
+    '',...
+    'Press the SPACEBAR to begin the task.'};
+cenTex(instructions,window,screenRect,black,white,24) % Print text centered
+if debug~=1;getResp('space');end; % Wait for user to press 'space bar';
+
+%Begin block loop
+for blockI=1:3
+% for blockI=1:1
+    %Shuffle stimuli by row for this block
+    stimPerm=randperm(length(stimList));
+    stimListBlock=stimList(stimPerm,:);
+    %Present instructions again on each block.
+    if blockI>1
+        betBlock_instructions = {'You are done with that block of the task.',...
+            'Please take a second to rest before returning to the task.',...
+            '',...
+            'In case you forgot: ',...
+            'If you think the correct response is ''red'', respond by pressing ''7''.',...
+            'If you think the correct response is ''blue'', respond by pressing ''8''.',...
+            'If you think the correct response is ''green'', respond by pressing ''9''.',...
+            '',...
+            'Press the SPACEBAR to begin the task.'};
+        cenTex(betBlock_instructions,window,screenRect,black,white,24) % Print text centered
+        if debug~=1;getResp('space');end; % Wait for user to press 'space bar';
+    end
+
+    for trialI=1:54
+        stimWord=stimListBlock(trialI,1);
+        stimCol=stimListBlock{trialI,2};
+        CR=stimListBlock{trialI,3};
+
+        %Display words but have the response keys along the top
+        cenTex_Stroop2(stimWord,window,screenRect,stimCol,white,100)
+
+        %Collect Response
+        %Now we want to actually collect and record results.  There will be
+        %1.5s for each response
+        if debug~=1
+            [resp, rt]=GetRespTimed('7','8','9',trialTiming);
+        else
+            resp=randi(3)-1; rt=rand(1)*2; 
+        end
+        Screen(window,'FillRect',white);
+        resp=resp+1;
+        if resp==CR
+            acc=1;
+        else
+            acc=0;
+        end
+%         pause(1*speedup)
+
+        Screen(window,'FillRect',white);
+        cenTex_Stroop2({'+'},window,screenRect,black,white,24)
+        pause(1*speedup);
+        
+        if stimCol(1)==170
+            stimColStr='Red';
+        elseif stimCol(2)==170
+            stimColStr='Green';
+        else
+            stimColStr='Blue';
+        end
+
+        stroopData{(blockI-1)*54+trialI+18,1}=stimWord;
+        stroopData{(blockI-1)*54+trialI+18,2}=stimColStr;
+        stroopData{(blockI-1)*54+trialI+18,3}=CR;
+        stroopData{(blockI-1)*54+trialI+18,4}=resp;
+        stroopData{(blockI-1)*54+trialI+18,5}=rt;
+        stroopData{(blockI-1)*54+trialI+18,6}=acc;
+    end 
+    
+    %Take a break at the end of each block
+end
+
+%Save data
+cd Data
+save(fileName,'stroopData');
+cd ..    
+
+%end of experiment bit
+% Screen(window,'FillRect',white);
+% instructions = {'You have reached the end of this task.',...
+%     '',...
+%     'Thank you very much for your participation.'};
+% cenTex(instructions,window,screenRect,black,white,32) % Print text centered
+% pause(5);
+Screen(window,'FillRect',white);
+
+% Screen('CloseAll')
+
