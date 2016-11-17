@@ -17,11 +17,11 @@ Yorigin = (screenRect(4)-screenRect(2))/2;
 Screen(window,'FillRect', bgcolor); % Fill background with backcolor
 
 if respBut==1
-    instHere='(7) - RED     (8) - BLUE     (9) - GREEN';
+    instHere='(7) - RED                (8) - BLUE                (9) - GREEN';
 elseif respBut==2
-    instHere='(7) - GREEN     (8) - RED     (9) - BLUE';
+    instHere='(7) - GREEN                (8) - RED                (9) - BLUE';
 else
-    instHere='(7) - BLUE     (8) - GREEN     (9) - RED';
+    instHere='(7) - BLUE                (8) - GREEN                (9) - RED';
 end
 
 % Write 'txt'

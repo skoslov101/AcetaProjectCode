@@ -1,4 +1,4 @@
-function [iidata] = Aceto_150_ii(debug, subjN, init, featNum, ruleNum, orderNum, window)
+function [iidata] = Aceto_150_ii(debug, subjN, init, featNum, ruleNum, orderNum, window, bottleNum)
 
 %% Experiment Parameter List/Cheatsheet
 %Features
@@ -500,7 +500,7 @@ Screen(window,'FillRect',black);
 % iidata{151,1}=Response;
 
 %% Store the data
-filename=['Cat_ii_' mat2str(subjN) '_' init '_' mat2str(orderNum) '.mat'];
+filename=['Cat_ii_' bottleNum '_' mat2str(subjN) '_' init '_' mat2str(orderNum) '.mat'];
 cd Data
 save(filename,'iidata');
 cd ..

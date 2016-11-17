@@ -79,7 +79,8 @@ for stimI=1:length(stimListOrig)
 end
 
 %The practice data stuff
-[nothing1,nothing2,pracList]=xlsread([pracDir '/pracList.xlsx']);
+% [nothing1,nothing2,pracList]=xlsread([pracDir '/pracList.xlsx']);
+[nothing1,nothing2,pracList]=xlsread([stimDir '/stimList.xlsx']);
 for stimI=1:length(pracList)
     if respBut==1
         pracList{stimI,5}=pracList{stimI,2}(find(pracList{stimI,2}=='.')-3:find(pracList{stimI,2}=='.')-2);
@@ -117,8 +118,20 @@ clear nothing2
 
 if respBut==1
     pracIns='(1) - Angry       (2) - Happy      (3) - Neutral';
+    instInsert1= 'Press ''1'' if the target face is ANGRY.';
+    instInsert2='Press ''2'' if the target face is HAPPY.';
+    instInsert3= 'Press ''3'' if the target face is NEUTRAL.';
 elseif respBut==2
-    pracIns='(1) - Neutral       (2) - Angry      (3) - Happy'
+    pracIns='(1) - Neutral       (2) - Angry      (3) - Happy';
+    instInsert2= 'Press ''2'' if the target face is ANGRY.';
+    instInsert3='Press ''3'' if the target face is HAPPY.';
+    instInsert1= 'Press ''1'' if the target face is NEUTRAL.';
+else
+    pracIns='(1) - Happy       (2) - Neutral      (3) - Angry';
+    instInsert3= 'Press ''3'' if the target face is ANGRY.';
+    instInsert1='Press ''1'' if the target face is HAPPY.';
+    instInsert2= 'Press ''2'' if the target face is NEUTRAL.';
+end
 
 
 
@@ -144,7 +157,7 @@ end
     
 cenTex({'Beginning Practice'},window,screenRect,white,black,24);
 pause(.5);
-%% Go through 10 trials of training with feedback
+%% Go through trials of training with feedback
 pracEnd=0;
 while pracEnd==0
     
@@ -162,8 +175,8 @@ while pracEnd==0
 
         % Display Stim Image
         %Set the image string name
-        imgFlank_Name=[pracDir '/' pracList{pracTrialI,1}];
-        imgTarget_Name=[pracDir '/' pracList{pracTrialI,2}];
+        imgFlank_Name=[stimDir '/' pracList{pracTrialI,1}];
+        imgTarget_Name=[stimDir '/' pracList{pracTrialI,2}];
         %Get the image information
         ruleCR=pracList{pracTrialI,6};
 
@@ -175,8 +188,10 @@ while pracEnd==0
         imgFlankG=rgb2gray(imgFlank);
 
         [wT, hT, nothing1] = size(imgTarg);
-        imageHeight=hT/2;
-        imageWidth=wT/3.75;
+%         imageHeight=hT/2
+%         imageWidth=wT/3.75
+        imageHeight=hT/(2*2)
+        imageWidth=wT/(3.75*)
         clear nothing1
 
         %Decide the location for right, left flanker + target
@@ -234,10 +249,7 @@ while pracEnd==0
             'In order to make sure that you understand that task completely',...
             'we are going to have you do a few more practice trials.',...
             '',...
-            'Please remember:',...
-            'Press ''1'' if the target face is ANGRY.',...
-            'Press ''2'' if the target face is HAPPY.',...
-            'Press ''3'' if the target face is NEUTRAL.',...
+            'Please remember:' instInsert1 instInsert2 instInsert3,...
             '',...
             'Please answer as quickly as possible without sacrificing accuracy.',...
             '',...
@@ -258,10 +270,7 @@ beginBlocks={'Great!',...
     'From now on, the response buttons will not be shown',...
     'on the top of the screen.',...
     '',...
-    'Please remember:',...
-    'Press ''1'' if the target face is ANGRY.',...
-    'Press ''2'' if the target face is HAPPY.',...
-    'Press ''3'' if the target face is NEUTRAL.',...
+    'Please remember:' instInsert1 instInsert2 instInsert3,...
     '',...
     'Please answer as quickly as possible without sacrificing accuracy.',...
     '',...

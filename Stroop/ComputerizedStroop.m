@@ -1,4 +1,4 @@
-function [stroopData]=ComputerizedStroop(debug,subjN,init, runNum, window, respBut)
+function [stroopData]=ComputerizedStroop(debug,subjN,init, runNum, window, respBut, bottleNum)
 %% Computerized Stroop Task
 %This is so that we can have a computerized stroop to run.  There are a few
 %different designs that could be implemented, but this is the 10minute,
@@ -25,7 +25,7 @@ exptDir = pwd;
 instDir = [exptDir '/Instructions'];
 % dataDir=[pwd '/Data/'];
 
-fileName=['Stroop' mat2str(subjN) '_' init '_' mat2str(runNum) '.mat'];
+fileName=['Stroop_' bottleNum '_' mat2str(subjN) '_' init '_' mat2str(runNum) '.mat'];
 
 %% For testing
 % Open window if window doesn't exist
@@ -37,7 +37,7 @@ fileName=['Stroop' mat2str(subjN) '_' init '_' mat2str(runNum) '.mat'];
 % end
 
 screenRect=get(0,'Screensize');
-Screen(window,'TextFont','Arial Black');
+Screen(window,'TextFont','Calibri');
 
 %% For testing
 if debug==1
@@ -249,7 +249,8 @@ cenTex(instructions,window,screenRect,black,white,24) % Print text centered
 if debug~=1;getResp('space');end; % Wait for user to press 'space bar';
 
 %% set font for Task
-Screen(window,'TextSize',100);
+Screen(window,'TextSize',52);
+% Screen(window,'TextSize',100);
 
 %% set data array
 stroopData=cell(180,5); %180 trials and 5 columns per trial
@@ -275,7 +276,8 @@ for pracI=1:18
     CR=pracList{pracI,3};
     
     %Display words but have the response keys along the top
-    cenTex_stroop(stimWord,window,screenRect,stimCol,white,100,respBut)
+%     cenTex_stroop(stimWord,window,screenRect,stimCol,white,100,respBut)
+    cenTex_stroop(stimWord,window,screenRect,stimCol,white,52,respBut)
     
     %Collect Response
     %Now we want to actually collect and record results.  There will be
@@ -298,7 +300,7 @@ for pracI=1:18
     pause(1*speedup)
     
     Screen(window,'FillRect',white);
-    cenTex_Stroop({'+'},window,screenRect,black,white,24, respBut)
+    cenTex_Stroop({'+'},window,screenRect,black,white,52, respBut)
     pause(1*speedup);
     
     if stimCol(1)==170
@@ -315,6 +317,7 @@ for pracI=1:18
     stroopData{pracI,4}=resp;
     stroopData{pracI,5}=rt;
     stroopData{pracI,6}=acc;
+    stroopData{pracI,7}=respBut;
 end
 
 %% Now for the real task
@@ -355,7 +358,8 @@ for blockI=1:3
         CR=stimListBlock{trialI,3};
 
         %Display words but have the response keys along the top
-        cenTex_Stroop2(stimWord,window,screenRect,stimCol,white,100)
+%         cenTex_Stroop2(stimWord,window,screenRect,stimCol,white,100)
+        cenTex_Stroop2(stimWord,window,screenRect,stimCol,white,52)
 
         %Collect Response
         %Now we want to actually collect and record results.  There will be
@@ -375,7 +379,7 @@ for blockI=1:3
 %         pause(1*speedup)
 
         Screen(window,'FillRect',white);
-        cenTex_Stroop2({'+'},window,screenRect,black,white,24)
+        cenTex_Stroop2({'+'},window,screenRect,black,white,52)
         pause(1*speedup);
         
         if stimCol(1)==170
@@ -392,6 +396,7 @@ for blockI=1:3
         stroopData{(blockI-1)*54+trialI+18,4}=resp;
         stroopData{(blockI-1)*54+trialI+18,5}=rt;
         stroopData{(blockI-1)*54+trialI+18,6}=acc;
+        stroopData{(blockI-1)*54+trialI+18,7}=respBut;
     end 
     
     %Take a break at the end of each block

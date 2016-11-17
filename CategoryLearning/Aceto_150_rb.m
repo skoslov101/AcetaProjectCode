@@ -1,4 +1,4 @@
-function [rbdata] = Aceto_150_rb(debug, subjN, init, featNum, ruleNum, orderNum, window)
+function [rbdata] = Aceto_150_rb(debug, subjN, init, featNum, ruleNum, orderNum, window, bottleNum)
 
 %% Experiment Parameter List/Cheatsheet
 %Features
@@ -519,7 +519,7 @@ Screen(window,'FillRect',black);
 
 
 %% Store the data
-filename=['Cat_rb_' mat2str(subjN) '_' init '_' mat2str(orderNum) '.mat'];
+filename=['Cat_rb_' bottleNum '_' mat2str(subjN) '_' init '_' mat2str(orderNum) '.mat'];
 cd Data
 save(filename,'rbdata');
 cd ..

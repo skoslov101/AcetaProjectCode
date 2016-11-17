@@ -1,6 +1,6 @@
-function [affData]=AffectiveFlankerTask(debug,subjN,init,runNum,window,respBut)
+function [affData]=AffectiveFlankerTask(debug,subjN,init,runNum,window,respBut,bottleNum)
 %% Set up the experiment parameters
-filename=['AffFlank_' mat2str(subjN) '_' init '_' mat2str(runNum) '.mat'];
+filename=['AffFlank_' bottleNum '_' mat2str(subjN) '_' init '_' mat2str(runNum) '.mat'];
 
 if debug==1;speedup=1/100;else speedup=1;end % Speed up delays if in debug mode
 
@@ -79,7 +79,8 @@ for stimI=1:length(stimListOrig)
 end
 
 %The practice data stuff
-[nothing1,nothing2,pracList]=xlsread([pracDir '/pracList.xlsx']);
+% [nothing1,nothing2,pracList]=xlsread([pracDir '/pracList.xlsx']);
+[nothing1,nothing2,pracList]=xlsread([stimDir '/stimList.xlsx']);
 for stimI=1:length(pracList)
     if respBut==1
         pracList{stimI,5}=pracList{stimI,2}(find(pracList{stimI,2}=='.')-3:find(pracList{stimI,2}=='.')-2);
@@ -156,7 +157,7 @@ end
     
 cenTex({'Beginning Practice'},window,screenRect,white,black,24);
 pause(.5);
-%% Go through 10 trials of training with feedback
+%% Go through trials of training with feedback
 pracEnd=0;
 while pracEnd==0
     
@@ -174,8 +175,8 @@ while pracEnd==0
 
         % Display Stim Image
         %Set the image string name
-        imgFlank_Name=[pracDir '/' pracList{pracTrialI,1}];
-        imgTarget_Name=[pracDir '/' pracList{pracTrialI,2}];
+        imgFlank_Name=[stimDir '/' pracList{pracTrialI,1}];
+        imgTarget_Name=[stimDir '/' pracList{pracTrialI,2}];
         %Get the image information
         ruleCR=pracList{pracTrialI,6};
 
@@ -187,8 +188,10 @@ while pracEnd==0
         imgFlankG=rgb2gray(imgFlank);
 
         [wT, hT, nothing1] = size(imgTarg);
-        imageHeight=hT/2;
-        imageWidth=wT/3.75;
+%         imageHeight=hT/2
+%         imageWidth=wT/3.75
+        imageHeight=hT/(2*2);
+        imageWidth=wT/(3.75*2);
         clear nothing1
 
         %Decide the location for right, left flanker + target
@@ -233,6 +236,7 @@ while pracEnd==0
         %ITI
         affData{pracTrialI,10}=jitListP(pracTrialI,1);
         pause(jitListP(pracTrialI,1)*speedup) %500ms ITI
+        affData{pracTrialI,11}=respBut;
     end
 
     %calculate practice accuracy
@@ -319,8 +323,8 @@ for blockI=1:6 %There will be 6 blocks
         
         [wT, hT, nothing1] = size(imgTarg);
         clear nothing1
-        imageHeight=hT/2;
-        imageWidth=wT/3.75;
+        imageHeight=hT/(2*2);
+        imageWidth=wT/(3.75*2);
        
         
         %Decide the location for right, left flanker + target
@@ -355,20 +359,21 @@ for blockI=1:6 %There will be 6 blocks
         end
         
         %Fill in data info
-        affData{(blockI-1)*length(stimList)+trialI+10,1}=blockI;
-        affData{(blockI-1)*length(stimList)+trialI+10,2}=trialI;
-        affData{(blockI-1)*length(stimList)+trialI+10,3}=stimList{trialI,2};
-        affData{(blockI-1)*length(stimList)+trialI+10,4}=stimList{trialI,1};
-        affData{(blockI-1)*length(stimList)+trialI+10,5}=stimList{trialI,4}; %1=Cong, 2=incong;
-        affData{(blockI-1)*length(stimList)+trialI+10,6}=ruleCR;
-        affData{(blockI-1)*length(stimList)+trialI+10,7}=resp;
-        affData{(blockI-1)*length(stimList)+trialI+10,8}=respAcc;
-        affData{(blockI-1)*length(stimList)+trialI+10,9}=RT;
+        affData{(blockI-1)*length(stimList)+trialI+72,1}=blockI;
+        affData{(blockI-1)*length(stimList)+trialI+72,2}=trialI;
+        affData{(blockI-1)*length(stimList)+trialI+72,3}=stimList{trialI,2};
+        affData{(blockI-1)*length(stimList)+trialI+72,4}=stimList{trialI,1};
+        affData{(blockI-1)*length(stimList)+trialI+72,5}=stimList{trialI,4}; %1=Cong, 2=incong;
+        affData{(blockI-1)*length(stimList)+trialI+72,6}=ruleCR;
+        affData{(blockI-1)*length(stimList)+trialI+72,7}=resp;
+        affData{(blockI-1)*length(stimList)+trialI+72,8}=respAcc;
+        affData{(blockI-1)*length(stimList)+trialI+72,9}=RT;
        
         
         %ITI
         pause(jitList(trialI)*speedup) %500ms ITI
-        affData{trialI,10}=jitList(trialI);
+        affData{(blockI-1)*length(stimList)+trialI+72,10}=jitList(trialI);
+        affData{(blockI-1)*length(stimList)+trialI+72,11}=respBut;
     end
 end
 
